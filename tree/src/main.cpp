@@ -11,7 +11,7 @@ void printHelp() {
 }
 
 int main(int argc, char *argv[]) {
-    std::string mode = "--test";
+    std::string mode = "--help";
     if (argc > 2) {
         printHelp();
         return 1;

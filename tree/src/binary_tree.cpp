@@ -2,11 +2,49 @@
 
 #include <algorithm>
 #include <iostream>
-#include <limits>
 #include <queue>
 #include <unordered_map>
 
 inline constexpr int SCREEN_COLUMNS = 80;
+
+inline std::string trim(const std::string &text) {
+    const std::size_t begin = text.find_first_not_of(" \t\r\n");
+    if (begin == std::string::npos) {
+        return "";
+    }
+
+    const std::size_t end = text.find_last_not_of(" \t\r\n");
+    return text.substr(begin, end - begin + 1);
+}
+
+inline bool readCreateChoice(int depth, const std::string &name) {
+    std::string input;
+    while (true) {
+        std::cout << "Узел " << name << ", глубина " << depth << ". Создать? (1/0): ";
+        if (!std::getline(std::cin, input)) {
+            std::cout << "\nВвод завершен. Узел пропущен.\n";
+            return false;
+        }
+
+        input = trim(input);
+        if (input == "1") {
+            return true;
+        }
+        if (input == "0") {
+            return false;
+        }
+
+        std::cout << "Ошибка: введите 1, чтобы создать узел, или 0, чтобы пропустить.\n";
+    }
+}
+
+inline std::string childName(const std::string &name, const std::string &child) {
+    if (name == "корень") {
+        return child;
+    }
+
+    return name + child;
+}
 
 std::unique_ptr<BinaryTree::Node> BinaryTree::makeNode(Node *parent) {
     auto node = std::make_unique<Node>();
@@ -36,29 +74,15 @@ BinaryTree BinaryTree::buildManual() {
     return tree;
 }
 
-std::unique_ptr<BinaryTree::Node>
-BinaryTree::buildManualNode(int depth, const std::string &position, Node *parent) {
-    int answer = 0;
-    do {
-        std::cout << position << ", глубина " << depth << " (1/0): ";
-        if (!(std::cin >> answer)) {
-            if (std::cin.eof()) {
-                return nullptr;
-            }
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            answer = -1;
-        }
-    } while (answer != 0 && answer != 1);
-
-    if (answer == 0) {
+std::unique_ptr<BinaryTree::Node> BinaryTree::buildManualNode(int depth, const std::string &name,
+                                                              Node *parent) {
+    if (!readCreateChoice(depth, name)) {
         return nullptr;
     }
 
     auto node = makeNode(parent);
-    node->left_ = buildManualNode(depth + 1, "левый потомок узла \"" + position + "\"", node.get());
-    node->right_ =
-        buildManualNode(depth + 1, "правый потомок узла \"" + position + "\"", node.get());
+    node->left_ = buildManualNode(depth + 1, childName(name, "Л"), node.get());
+    node->right_ = buildManualNode(depth + 1, childName(name, "П"), node.get());
     return node;
 }
 

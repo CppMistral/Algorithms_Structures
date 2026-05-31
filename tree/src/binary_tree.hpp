@@ -14,6 +14,13 @@ class BinaryTree {
         std::unique_ptr<Node> right_;
     };
 
+    BinaryTree() = default;
+    BinaryTree(const BinaryTree &) = delete;
+    BinaryTree(BinaryTree &&) noexcept = default;
+    BinaryTree &operator=(const BinaryTree &) = delete;
+    BinaryTree &operator=(BinaryTree &&) noexcept = default;
+    ~BinaryTree() = default;
+
     [[nodiscard]] static BinaryTree buildTest();
     [[nodiscard]] static BinaryTree buildManual();
 
@@ -28,7 +35,7 @@ class BinaryTree {
     char nextTag_ = 'A';
 
     static std::unique_ptr<Node> makeNode(Node *parent = nullptr);
-    static std::unique_ptr<Node> buildManualNode(int depth, const std::string &position,
+    static std::unique_ptr<Node> buildManualNode(int depth, const std::string &name,
                                                  Node *parent = nullptr);
 
     void markSymmetric();

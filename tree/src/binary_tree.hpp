@@ -48,5 +48,5 @@ class BinaryTree {
     [[nodiscard]] int height(const Node *node) const;
     void placeNode(const Node *node, std::vector<std::string> &screen, int row, int leftColumn,
                    int rightColumn) const;
-    [[nodiscard]] std::vector<const Node *> breadthFirstNodes() const;
+    [[nodiscard]] std::vector<const Node *> BFS() const;
 };

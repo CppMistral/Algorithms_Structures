@@ -134,7 +134,7 @@ void BinaryTree::print() const {
     }
 
     std::cout << '\n';
-    const std::vector<const Node *> nodes = breadthFirstNodes();
+    const std::vector<const Node *> nodes = BFS();
     const std::unordered_map<const Node *, int> descendantsByNode = countDescendants(nodes);
 
     std::cout << "Обход в ширину: ";
@@ -173,7 +173,7 @@ void BinaryTree::placeNode(const Node *node, std::vector<std::string> &screen, i
     placeNode(node->right_.get(), screen, row + 1, column + 1, rightColumn);
 }
 
-std::vector<const BinaryTree::Node *> BinaryTree::breadthFirstNodes() const {
+std::vector<const BinaryTree::Node *> BinaryTree::BFS() const {
     std::vector<const Node *> result;
     if (root_ == nullptr) {
         return result;

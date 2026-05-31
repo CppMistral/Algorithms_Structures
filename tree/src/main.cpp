@@ -5,14 +5,13 @@
 
 void printHelp() {
     std::cout << "Использование:\n"
-              << "  ./tree --sample   готовое дерево для демонстрации\n"
+              << "  ./tree --test     тестовое дерево\n"
               << "  ./tree --manual   ручной ввод структуры дерева\n"
-              << "  ./tree --random   случайное дерево\n"
               << "  ./tree --help     справка\n";
 }
 
 int main(int argc, char *argv[]) {
-    std::string mode = "--sample";
+    std::string mode = "--test";
     if (argc > 2) {
         printHelp();
         return 1;
@@ -22,12 +21,10 @@ int main(int argc, char *argv[]) {
     }
 
     BinaryTree tree;
-    if (mode == "--sample") {
-        tree = BinaryTree::buildSample();
+    if (mode == "--test") {
+        tree = BinaryTree::buildTest();
     } else if (mode == "--manual") {
         tree = BinaryTree::buildManual();
-    } else if (mode == "--random") {
-        tree = BinaryTree::buildRandom();
     } else if (mode == "--help" || mode == "-h") {
         printHelp();
         return 0;
@@ -39,13 +36,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Практическая работа по теме 3 \"Деревья\"\n"
               << "Вариант 31: двоичное дерево, симметричная разметка, обход в ширину.\n\n";
     tree.print();
-    if (tree.empty()) {
-        return 0;
-    }
-
-    std::cout << '\n';
-    tree.printBreadthFirst();
-    tree.printDescendants();
 
     return 0;
 }

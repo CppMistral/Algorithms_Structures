@@ -1,56 +1,43 @@
 #include "binary_tree.hpp"
 
 #include <algorithm>
-#include <chrono>
 #include <iostream>
 #include <limits>
 #include <queue>
+#include <unordered_map>
 
-namespace {
-constexpr int SCREEN_COLUMNS = 80;
+inline constexpr int SCREEN_COLUMNS = 80;
+
+std::unique_ptr<BinaryTree::Node> BinaryTree::makeNode(Node *parent) {
+    auto node = std::make_unique<Node>();
+    node->parent_ = parent;
+    return node;
 }
 
-std::unique_ptr<BinaryTree::Node> BinaryTree::makeNode(int &nextId) {
-    return std::make_unique<Node>(nextId++);
-}
-
-BinaryTree BinaryTree::buildSample() {
-    int nextId = 1;
+BinaryTree BinaryTree::buildTest() {
     BinaryTree tree;
-    tree.root_ = makeNode(nextId);
-    tree.root_->left_ = makeNode(nextId);
-    tree.root_->right_ = makeNode(nextId);
-    tree.root_->left_->left_ = makeNode(nextId);
-    tree.root_->left_->right_ = makeNode(nextId);
-    tree.root_->right_->right_ = makeNode(nextId);
-    tree.root_->left_->right_->left_ = makeNode(nextId);
+    tree.root_ = makeNode();
+    tree.root_->left_ = makeNode(tree.root_.get());
+    tree.root_->right_ = makeNode(tree.root_.get());
+    tree.root_->left_->left_ = makeNode(tree.root_->left_.get());
+    tree.root_->left_->right_ = makeNode(tree.root_->left_.get());
+    tree.root_->right_->right_ = makeNode(tree.root_->right_.get());
+    tree.root_->left_->right_->left_ = makeNode(tree.root_->left_->right_.get());
 
     tree.markSymmetric();
     return tree;
 }
 
 BinaryTree BinaryTree::buildManual() {
-    int nextId = 1;
     BinaryTree tree;
     std::cout << "Введите структуру дерева. 1 - создать вершину, 0 - пропустить.\n";
-    tree.root_ = buildManualNode(nextId, 0, "корень");
+    tree.root_ = buildManualNode(0, "корень");
     tree.markSymmetric();
     return tree;
 }
 
-BinaryTree BinaryTree::buildRandom() {
-    int nextId = 1;
-    BinaryTree tree;
-    const auto seed =
-        static_cast<unsigned>(std::chrono::steady_clock::now().time_since_epoch().count());
-    std::mt19937 gen(seed);
-    tree.root_ = buildRandomNode(nextId, 0, 4, gen);
-    tree.markSymmetric();
-    return tree;
-}
-
-std::unique_ptr<BinaryTree::Node> BinaryTree::buildManualNode(int &nextId, int depth,
-                                                              const std::string &position) {
+std::unique_ptr<BinaryTree::Node>
+BinaryTree::buildManualNode(int depth, const std::string &position, Node *parent) {
     int answer = 0;
     do {
         std::cout << position << ", глубина " << depth << " (1/0): ";
@@ -68,35 +55,16 @@ std::unique_ptr<BinaryTree::Node> BinaryTree::buildManualNode(int &nextId, int d
         return nullptr;
     }
 
-    auto node = makeNode(nextId);
-    node->left_ =
-        buildManualNode(nextId, depth + 1, "левый потомок вершины " + std::to_string(node->id_));
+    auto node = makeNode(parent);
+    node->left_ = buildManualNode(depth + 1, "левый потомок узла \"" + position + "\"", node.get());
     node->right_ =
-        buildManualNode(nextId, depth + 1, "правый потомок вершины " + std::to_string(node->id_));
-    return node;
-}
-
-std::unique_ptr<BinaryTree::Node> BinaryTree::buildRandomNode(int &nextId, int depth, int maxDepth,
-                                                              std::mt19937 &gen) {
-    if (depth > maxDepth) {
-        return nullptr;
-    }
-
-    std::bernoulli_distribution shouldCreate(depth == 0 ? 1.0 : std::max(0.2, 0.85 - depth * 0.15));
-    if (!shouldCreate(gen)) {
-        return nullptr;
-    }
-
-    auto node = makeNode(nextId);
-    node->left_ = buildRandomNode(nextId, depth + 1, maxDepth, gen);
-    node->right_ = buildRandomNode(nextId, depth + 1, maxDepth, gen);
+        buildManualNode(depth + 1, "правый потомок узла \"" + position + "\"", node.get());
     return node;
 }
 
 void BinaryTree::markSymmetric() {
-    nextLabel_ = 'A';
+    nextTag_ = 'A';
     markSymmetric(root_.get());
-    calculateDescendants(root_.get());
 }
 
 void BinaryTree::markSymmetric(Node *node) {
@@ -105,19 +73,25 @@ void BinaryTree::markSymmetric(Node *node) {
     }
 
     markSymmetric(node->left_.get());
-    node->label_ = nextLabel_++;
+    node->tag_ = nextTag_++;
     markSymmetric(node->right_.get());
 }
 
-int BinaryTree::calculateDescendants(Node *node) {
-    if (node == nullptr) {
-        return 0;
+std::unordered_map<const BinaryTree::Node *, int>
+BinaryTree::countDescendants(const std::vector<const Node *> &nodes) {
+    std::unordered_map<const Node *, int> descendantsByNode;
+
+    for (auto it = nodes.rbegin(); it != nodes.rend(); ++it) {
+        const Node *node = *it;
+        descendantsByNode.try_emplace(node, 0);
+
+        const Node *parent = node->parent_;
+        if (parent != nullptr) {
+            descendantsByNode[parent] += descendantsByNode[node] + 1;
+        }
     }
 
-    const int leftSize = calculateDescendants(node->left_.get());
-    const int rightSize = calculateDescendants(node->right_.get());
-    node->descendants_ = leftSize + rightSize;
-    return node->descendants_ + 1;
+    return descendantsByNode;
 }
 
 void BinaryTree::print() const {
@@ -133,6 +107,24 @@ void BinaryTree::print() const {
     placeNode(root_.get(), screen, 0, 0, SCREEN_COLUMNS - 1);
     for (const std::string &line : screen) {
         std::cout << line << '\n';
+    }
+
+    std::cout << '\n';
+    const std::vector<const Node *> nodes = breadthFirstNodes();
+    const std::unordered_map<const Node *, int> descendantsByNode = countDescendants(nodes);
+
+    std::cout << "Обход в ширину: ";
+    for (std::size_t i = 0; i < nodes.size(); ++i) {
+        if (i != 0) {
+            std::cout << ' ';
+        }
+        std::cout << nodes[i]->tag_;
+    }
+    std::cout << '\n';
+
+    std::cout << "Количество потомков у каждой вершины:\n";
+    for (const Node *node : nodes) {
+        std::cout << "  " << node->tag_ << ": " << descendantsByNode.at(node) << '\n';
     }
 }
 
@@ -151,7 +143,7 @@ void BinaryTree::placeNode(const Node *node, std::vector<std::string> &screen, i
     }
 
     const int column = (leftColumn + rightColumn) / 2;
-    screen[row][column] = node->label_;
+    screen[row][column] = node->tag_;
 
     placeNode(node->left_.get(), screen, row + 1, leftColumn, column - 1);
     placeNode(node->right_.get(), screen, row + 1, column + 1, rightColumn);
@@ -180,23 +172,4 @@ std::vector<const BinaryTree::Node *> BinaryTree::breadthFirstNodes() const {
     }
 
     return result;
-}
-
-void BinaryTree::printBreadthFirst() const {
-    const std::vector<const Node *> nodes = breadthFirstNodes();
-    std::cout << "Обход в ширину: ";
-    for (std::size_t i = 0; i < nodes.size(); ++i) {
-        if (i != 0) {
-            std::cout << ' ';
-        }
-        std::cout << nodes[i]->label_;
-    }
-    std::cout << '\n';
-}
-
-void BinaryTree::printDescendants() const {
-    std::cout << "Количество потомков у каждой вершины:\n";
-    for (const Node *node : breadthFirstNodes()) {
-        std::cout << "  " << node->label_ << ": " << node->descendants_ << '\n';
-    }
 }

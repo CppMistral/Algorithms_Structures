@@ -1,21 +1,11 @@
 #include "binary_tree.hpp"
 
-#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <unordered_map>
 
 inline constexpr int SCREEN_COLUMNS = 80;
-
-inline std::string trim(const std::string &text) {
-    const std::size_t begin = text.find_first_not_of(" \t\r\n");
-    if (begin == std::string::npos) {
-        return "";
-    }
-
-    const std::size_t end = text.find_last_not_of(" \t\r\n");
-    return text.substr(begin, end - begin + 1);
-}
+inline constexpr int MAX_RANDOM_TREE_NODES = 'Z' - 'A' + 1;
 
 inline bool readCreateChoice(int depth, const std::string &name) {
     std::string input;
@@ -26,7 +16,6 @@ inline bool readCreateChoice(int depth, const std::string &name) {
             return false;
         }
 
-        input = trim(input);
         if (input == "1") {
             return true;
         }
@@ -54,16 +43,27 @@ std::unique_ptr<BinaryTree::Node> BinaryTree::makeNode(Node *parent) {
 
 BinaryTree BinaryTree::buildTest() {
     BinaryTree tree;
-    tree.root_ = makeNode();
-    tree.root_->left_ = makeNode(tree.root_.get());
-    tree.root_->right_ = makeNode(tree.root_.get());
-    tree.root_->left_->left_ = makeNode(tree.root_->left_.get());
-    tree.root_->left_->right_ = makeNode(tree.root_->left_.get());
-    tree.root_->right_->right_ = makeNode(tree.root_->right_.get());
-    tree.root_->left_->right_->left_ = makeNode(tree.root_->left_->right_.get());
 
+    const auto seed = static_cast<unsigned>(time(nullptr));
+    std::srand(seed);
+    int remainingNodes = MAX_RANDOM_TREE_NODES;
+    tree.root_ = buildRandomNode(0, remainingNodes);
     tree.markSymmetric();
     return tree;
+}
+
+std::unique_ptr<BinaryTree::Node> BinaryTree::buildRandomNode(int depth, int &remainingNodes,
+                                                              Node *parent) {
+    const bool shouldCreate = (depth < (std::rand() % 6) + 1) && (remainingNodes > 0);
+    if (!shouldCreate) {
+        return nullptr;
+    }
+
+    --remainingNodes;
+    auto node = makeNode(parent);
+    node->left_ = buildRandomNode(depth + 1, remainingNodes, node.get());
+    node->right_ = buildRandomNode(depth + 1, remainingNodes, node.get());
+    return node;
 }
 
 BinaryTree BinaryTree::buildManual() {

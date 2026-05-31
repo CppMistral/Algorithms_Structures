@@ -35,6 +35,8 @@ class BinaryTree {
     char nextTag_ = 'A';
 
     static std::unique_ptr<Node> makeNode(Node *parent = nullptr);
+    static std::unique_ptr<Node> buildRandomNode(int depth, int &remainingNodes,
+                                                 Node *parent = nullptr);
     static std::unique_ptr<Node> buildManualNode(int depth, const std::string &name,
                                                  Node *parent = nullptr);
 

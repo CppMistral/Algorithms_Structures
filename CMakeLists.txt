@@ -4,3 +4,4 @@ project(labs LANGUAGES CXX)
 
 add_subdirectory(sets)
 add_subdirectory(tree)
+add_subdirectory(graph)

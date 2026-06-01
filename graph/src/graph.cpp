@@ -1,7 +1,6 @@
 #include "graph.hpp"
 
 #include <iomanip>
-#include <iostream>
 #include <stack>
 #include <string>
 

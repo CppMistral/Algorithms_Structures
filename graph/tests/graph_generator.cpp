@@ -1,6 +1,5 @@
 #include "graph_generator.hpp"
 
-#include <cstdlib>
 #include <ctime>
 
 GraphGenerator::GraphGenerator() {

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <ostream>
+#include <iostream>
 #include <unordered_set>
-#include <utility>
 #include <vector>
 
 class Graph {
@@ -22,7 +21,7 @@ class Graph {
         SpanningForest &operator=(const SpanningForest &) = delete;
         SpanningForest &operator=(SpanningForest &&) noexcept = default;
 
-        [[nodiscard]] bool isGraphConnected() const;
+        bool isGraphConnected() const;
 
         void addTree(Tree tree);
         void print(std::ostream &output) const;
@@ -40,9 +39,9 @@ class Graph {
     Graph &operator=(const Graph &) = delete;
     Graph &operator=(Graph &&) noexcept = default;
 
-    [[nodiscard]] std::size_t vertexCount() const;
-    [[nodiscard]] const std::vector<Vertex> &neighbors(Vertex vertex) const;
-    [[nodiscard]] SpanningForest spanningForest() const;
+    std::size_t vertexCount() const;
+    const std::vector<Vertex> &neighbors(Vertex vertex) const;
+    SpanningForest spanningForest() const;
 
     bool addEdge(Vertex first, Vertex second);
     void print() const;
@@ -50,7 +49,6 @@ class Graph {
   private:
     std::vector<std::vector<Vertex>> adjacencyLists_;
 
-    [[nodiscard]] bool isValidVertex(Vertex vertex) const;
-    [[nodiscard]] SpanningForest::Tree DFS(Vertex startVertex,
-                                           std::unordered_set<Graph::Vertex> &visited) const;
+    bool isValidVertex(Vertex vertex) const;
+    SpanningForest::Tree DFS(Vertex startVertex, std::unordered_set<Graph::Vertex> &visited) const;
 };

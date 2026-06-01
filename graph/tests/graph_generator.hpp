@@ -2,8 +2,6 @@
 
 #include "graph.hpp"
 
-#include <cstddef>
-
 class GraphGenerator {
   public:
     static constexpr std::size_t MaxVertexCount = 20;
@@ -16,12 +14,12 @@ class GraphGenerator {
     GraphGenerator &operator=(const GraphGenerator &) = delete;
     GraphGenerator &operator=(GraphGenerator &&) noexcept = delete;
 
-    [[nodiscard]] Graph generateRandom(bool connected = true);
+    Graph generateRandom(bool connected = true);
 
   private:
     void generateConnected(Graph &graph);
     void generateDisconnected(Graph &graph);
     void addRandomEdges(Graph &graph, Graph::Vertex begin, Graph::Vertex end);
 
-    [[nodiscard]] static std::size_t randomSize(std::size_t maxInclusive);
+    static std::size_t randomSize(std::size_t maxInclusive);
 };

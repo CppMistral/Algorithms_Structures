@@ -2,26 +2,26 @@
 
 #include "graph.hpp"
 
-#include <random>
+#include <cstddef>
 
 class GraphGenerator {
   public:
-    struct GeneratedGraph {
-        Graph graph;
-        std::size_t edgeCount = 0;
-    };
+    static constexpr std::size_t MaxVertexCount = 20;
 
     GraphGenerator();
-    explicit GraphGenerator(unsigned seed);
+    GraphGenerator(const GraphGenerator &) = delete;
+    GraphGenerator(GraphGenerator &&) noexcept = delete;
+    ~GraphGenerator() = default;
 
-    [[nodiscard]] GeneratedGraph generate(std::size_t vertexCount, bool forceConnected);
+    GraphGenerator &operator=(const GraphGenerator &) = delete;
+    GraphGenerator &operator=(GraphGenerator &&) noexcept = delete;
+
+    [[nodiscard]] Graph generateRandom(bool connected = true);
 
   private:
-    std::mt19937 rng_;
+    void generateConnected(Graph &graph);
+    void generateDisconnected(Graph &graph);
+    void addRandomEdges(Graph &graph, Graph::Vertex begin, Graph::Vertex end);
 
-    void generateConnected(GeneratedGraph &generated);
-    void generateArbitrary(GeneratedGraph &generated);
-    void addRandomEdges(GeneratedGraph &generated, std::size_t targetEdgeCount);
-
-    [[nodiscard]] static std::size_t maxEdgeCount(std::size_t vertexCount);
+    [[nodiscard]] static std::size_t randomSize(std::size_t maxInclusive);
 };

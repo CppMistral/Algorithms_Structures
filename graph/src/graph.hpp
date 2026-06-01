@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <cstddef>
 #include <unordered_set>
 #include <vector>
 
@@ -11,37 +11,38 @@ class Graph {
     class SpanningForest {
       public:
         using Tree = std::vector<Vertex>;
+
         SpanningForest() = default;
-        SpanningForest(const SpanningForest &other) = delete;
-        SpanningForest(SpanningForest &&other) noexcept = default;
+        SpanningForest(const SpanningForest &) = delete;
+        SpanningForest(SpanningForest &&) noexcept = default;
         ~SpanningForest() = default;
 
-        SpanningForest &operator=(const SpanningForest &other) = default;
-        SpanningForest &operator=(SpanningForest &&other) noexcept = default;
+        SpanningForest &operator=(const SpanningForest &) = delete;
+        SpanningForest &operator=(SpanningForest &&) noexcept = default;
 
         [[nodiscard]] bool isGraphConnected() const;
 
-        void addTree(std::vector<Vertex> tree);
-        void print(std::ostream &out) const;
+        void addTree(Tree tree);
+        void print() const;
 
       private:
         std::vector<Tree> forest_;
     };
 
     explicit Graph(std::size_t vertexCount = 0);
-    Graph(const Graph &other) = delete;
-    Graph(Graph &&other) noexcept = delete;
+    Graph(const Graph &) = delete;
+    Graph(Graph &&) noexcept = default;
     ~Graph() = default;
 
-    Graph &operator=(const Graph &other) = delete;
-    Graph &operator=(Graph &&other) noexcept = delete;
+    Graph &operator=(const Graph &) = delete;
+    Graph &operator=(Graph &&) noexcept = default;
 
     [[nodiscard]] std::size_t vertexCount() const;
     [[nodiscard]] const std::vector<Vertex> &neighbors(Vertex vertex) const;
     [[nodiscard]] SpanningForest spanningForest() const;
 
     bool addEdge(Vertex first, Vertex second);
-    void print(std::ostream &out) const;
+    void print() const;
 
   private:
     std::vector<std::vector<Vertex>> adjacencyLists_;

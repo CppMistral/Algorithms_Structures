@@ -1,6 +1,9 @@
 #include "graph.hpp"
 
+#include <iomanip>
+#include <iostream>
 #include <stack>
+#include <string>
 
 Graph::Graph(std::size_t vertexCount) : adjacencyLists_(vertexCount) {}
 
@@ -39,7 +42,7 @@ Graph::SpanningForest::Tree Graph::DFS(Vertex startVertex,
         stack.pop();
 
         for (Vertex neighbor : neighbors(currentVertex)) {
-            if (!visited.contains(neighbor)) {
+            if (visited.contains(neighbor)) {
                 continue;
             }
 
@@ -68,14 +71,29 @@ bool Graph::addEdge(Vertex first, Vertex second) {
     return true;
 }
 
-void Graph::print(std::ostream &out) const {
-    out << "Список смежности:\n";
-    for (Vertex vertex = 0; vertex < adjacencyLists_.size(); ++vertex) {
-        out << vertex << ": ";
-        for (Vertex neighbor : adjacencyLists_[vertex]) {
-            out << neighbor << ' ';
+void Graph::print() const {
+    constexpr int CellWidth = 3;
+    constexpr int LegendWidth = 3;
+
+    std::cout << "Матрица смежности:\n";
+    std::cout << std::setw(LegendWidth) << ' ' << " |";
+    for (Vertex column = 0; column < adjacencyLists_.size(); ++column) {
+        std::cout << std::setw(CellWidth) << column;
+    }
+    std::cout << '\n'
+              << std::string(static_cast<std::size_t>(LegendWidth), '-') << "-+"
+              << std::string(adjacencyLists_.size() * CellWidth, '-') << '\n';
+
+    for (Vertex row = 0; row < adjacencyLists_.size(); ++row) {
+        const auto &rowNeighbors = adjacencyLists_[row];
+
+        std::cout << std::setw(LegendWidth) << row << " |";
+        for (Vertex column = 0; column < adjacencyLists_.size(); ++column) {
+            const bool hasEdge =
+                std::find(rowNeighbors.begin(), rowNeighbors.end(), column) != rowNeighbors.end();
+            std::cout << std::setw(CellWidth) << (hasEdge ? 1 : 0);
         }
-        out << '\n';
+        std::cout << '\n';
     }
 }
 
@@ -87,19 +105,21 @@ bool Graph::SpanningForest::isGraphConnected() const {
     return forest_.size() <= 1;
 }
 
-void Graph::SpanningForest::addTree(std::vector<Vertex> tree) {
+void Graph::SpanningForest::addTree(Tree tree) {
     forest_.push_back(std::move(tree));
 }
 
-void Graph::SpanningForest::print(std::ostream &out) const {
-    out << "Деревья глубинного стягивающего леса: " << forest_.size() << '\n';
-    for (const auto &tree : forest_) {
+void Graph::SpanningForest::print() const {
+    std::cout << "Глубинный стягивающий лес\n";
+    for (std::size_t treeIndex = 0; treeIndex < forest_.size(); ++treeIndex) {
+        const auto &tree = forest_[treeIndex];
+        std::cout << "Дерево " << treeIndex + 1 << ": ";
         for (std::size_t vertexIndex = 0; vertexIndex < tree.size(); ++vertexIndex) {
             if (vertexIndex > 0) {
-                out << " - ";
+                std::cout << " - ";
             }
-            out << tree[vertexIndex];
+            std::cout << tree[vertexIndex];
         }
-        out << '\n';
+        std::cout << '\n';
     }
 }

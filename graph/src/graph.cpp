@@ -30,11 +30,10 @@ Graph::SpanningForest Graph::spanningForest() const {
 
 Graph::SpanningForest::Tree Graph::DFS(Vertex startVertex,
                                        std::unordered_set<Graph::Vertex> &visited) const {
-    std::vector<Vertex> tree;
+    SpanningForest::Tree tree;
     std::stack<Vertex> stack;
 
     visited.insert(startVertex);
-    tree.push_back(startVertex);
     stack.push(startVertex);
 
     while (!stack.empty()) {
@@ -47,9 +46,13 @@ Graph::SpanningForest::Tree Graph::DFS(Vertex startVertex,
             }
 
             visited.insert(neighbor);
-            tree.push_back(neighbor);
+            tree.emplace_back(currentVertex, neighbor);
             stack.push(neighbor);
         }
+    }
+
+    if (tree.empty()) {
+        tree.emplace_back(startVertex, startVertex);
     }
 
     return tree;
@@ -109,17 +112,28 @@ void Graph::SpanningForest::addTree(Tree tree) {
     forest_.push_back(std::move(tree));
 }
 
-void Graph::SpanningForest::print() const {
-    std::cout << "Глубинный стягивающий лес\n";
+void Graph::SpanningForest::print(std::ostream &output) const {
+    output << "Глубинный стягивающий лес\n";
     for (std::size_t treeIndex = 0; treeIndex < forest_.size(); ++treeIndex) {
         const auto &tree = forest_[treeIndex];
-        std::cout << "Дерево " << treeIndex + 1 << ": ";
-        for (std::size_t vertexIndex = 0; vertexIndex < tree.size(); ++vertexIndex) {
-            if (vertexIndex > 0) {
-                std::cout << " - ";
+        output << "Дерево " << treeIndex + 1 << ": ";
+
+        if (tree.size() == 1 && tree.front().first == tree.front().second) {
+            output << tree.front().first;
+        } else {
+            for (std::size_t edgeIndex = 0; edgeIndex < tree.size(); ++edgeIndex) {
+                if (edgeIndex > 0) {
+                    output << ' ';
+                }
+
+                output << '(' << tree[edgeIndex].first << ", " << tree[edgeIndex].second << ')';
             }
-            std::cout << tree[vertexIndex];
         }
-        std::cout << '\n';
+
+        output << '\n';
     }
+}
+
+void Graph::SpanningForest::print() const {
+    print(std::cout);
 }

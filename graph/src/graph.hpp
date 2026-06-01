@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstddef>
+#include <ostream>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 class Graph {
@@ -10,7 +11,8 @@ class Graph {
 
     class SpanningForest {
       public:
-        using Tree = std::vector<Vertex>;
+        using Edge = std::pair<Vertex, Vertex>;
+        using Tree = std::vector<Edge>;
 
         SpanningForest() = default;
         SpanningForest(const SpanningForest &) = delete;
@@ -23,6 +25,7 @@ class Graph {
         [[nodiscard]] bool isGraphConnected() const;
 
         void addTree(Tree tree);
+        void print(std::ostream &output) const;
         void print() const;
 
       private:

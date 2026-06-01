@@ -21,10 +21,10 @@ class BinaryTree {
     BinaryTree &operator=(BinaryTree &&) noexcept = default;
     ~BinaryTree() = default;
 
-    [[nodiscard]] static BinaryTree buildTest();
-    [[nodiscard]] static BinaryTree buildManual();
+    static BinaryTree buildTest();
+    static BinaryTree buildManual();
 
-    [[nodiscard]] bool empty() const {
+    bool empty() const {
         return root_ == nullptr;
     }
 
@@ -42,11 +42,11 @@ class BinaryTree {
 
     void markSymmetric();
     void markSymmetric(Node *node);
-    [[nodiscard]] static std::unordered_map<const Node *, int>
-    countDescendants(const std::vector<const Node *> &nodes);
+    static std::unordered_map<const Node *, int> countDescendants(
+        const std::vector<const Node *> &nodes);
 
-    [[nodiscard]] int height(const Node *node) const;
+    int height(const Node *node) const;
     void placeNode(const Node *node, std::vector<std::string> &screen, int row, int leftColumn,
                    int rightColumn) const;
-    [[nodiscard]] std::vector<const Node *> BFS() const;
+    std::vector<const Node *> BFS() const;
 };

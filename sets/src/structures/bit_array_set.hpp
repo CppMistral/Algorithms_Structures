@@ -3,7 +3,7 @@
 #include "../common.hpp"
 
 struct BitArraySet {
-  std::array<bool, UNIVERSE_SIZE> bits{};
+    bool bits[UNIVERSE_SIZE]{};
 };
 
 template <> BitArraySet fromString<BitArraySet>(const std::string &s);

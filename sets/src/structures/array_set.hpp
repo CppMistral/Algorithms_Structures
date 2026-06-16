@@ -3,8 +3,8 @@
 #include "../common.hpp"
 
 struct ArraySet {
-  std::array<char, UNIVERSE_SIZE + 1> elements{};
-  int size = 0;
+    char elements[UNIVERSE_SIZE + 1]{};
+    int size = 0;
 };
 
 template <> ArraySet fromString<ArraySet>(const std::string &s);

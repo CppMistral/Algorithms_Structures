@@ -45,6 +45,14 @@ target_include_directories(${target} PRIVATE
 )
 endforeach()
 
+target_compile_options(sets_structs PRIVATE
+    -O0
+)
+
+target_compile_options(sets_classes PRIVATE
+    -O0
+)
+
 target_compile_definitions(sets_structs PRIVATE
     WITH_STRUCTURES
 )

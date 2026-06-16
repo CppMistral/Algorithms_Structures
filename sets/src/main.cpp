@@ -16,7 +16,7 @@
 #endif
 #include "generator.hpp"
 
-inline constinit const unsigned int BENCHMARK_REPEAT_COUNT = 10000000;
+inline constinit const unsigned long long BENCHMARK_REPEAT_COUNT = 100000000;
 inline constinit const int BENCHMARK_TEST_COUNT = 1;
 inline constinit const int TEST_COUNT = 1000;
 
@@ -48,7 +48,7 @@ template <typename Set> auto benchmarkFormula(const TestCase &test) {
         total += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
     }
 
-    return total / BENCHMARK_REPEAT_COUNT;
+    return total;
 }
 
 void printHelp() {
@@ -173,8 +173,8 @@ void run(const std::vector<TestCase> &tests, bool verbose = true) {
 }
 
 void printBenchmarkResult(const char *name, std::chrono::nanoseconds time) {
-    const auto milliseconds = time.count();
-    std::cout << "  " << name << ": " << milliseconds << " нс\n";
+    const auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
+    std::cout << "  " << name << ": " << milliseconds << "  мс\n";
 }
 
 void runBenchmarks() {

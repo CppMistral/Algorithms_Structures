@@ -1,6 +1,9 @@
 #include "list_set.hpp"
 
+#include <iostream>
+
 template <> ListSet fromString<ListSet>(const std::string &s) {
+    std::cout << "fromString<ListSet> called\n";
     ListSet set{};
     for (char c : s) {
         if (!set.contains(c)) {
@@ -11,6 +14,7 @@ template <> ListSet fromString<ListSet>(const std::string &s) {
 }
 
 template <> std::string toString<ListSet>(const ListSet &set) {
+    std::cout << "toString<ListSet> called\n";
     std::string result;
     for (char c : UNIVERSE) {
         for (ListSet::ListNode *current = set.head; current != nullptr; current = current->next) {
@@ -24,10 +28,12 @@ template <> std::string toString<ListSet>(const ListSet &set) {
 }
 
 ListSet::ListSet(const ListSet &other) {
+    std::cout << "ListSet::ListSet copy called\n";
     *this = other;
 }
 
 ListSet &ListSet::operator=(const ListSet &other) {
+    std::cout << "ListSet::operator= copy called\n";
     if (this != &other) {
         clear();
         copyFrom(other);
@@ -36,11 +42,13 @@ ListSet &ListSet::operator=(const ListSet &other) {
 }
 
 ListSet::ListSet(ListSet &&other) noexcept : head(other.head), size(other.size) {
+    std::cout << "ListSet::ListSet move called\n";
     other.head = nullptr;
     other.size = 0;
 }
 
 ListSet &ListSet::operator=(ListSet &&other) noexcept {
+    std::cout << "ListSet::operator= move called\n";
     if (this != &other) {
         clear();
         head = other.head;
@@ -52,10 +60,12 @@ ListSet &ListSet::operator=(ListSet &&other) noexcept {
 }
 
 ListSet::~ListSet() {
+    std::cout << "ListSet::~ListSet called\n";
     clear();
 }
 
 void ListSet::clear() {
+    std::cout << "ListSet::clear called\n";
     ListNode *current = head;
     while (current != nullptr) {
         ListNode *next = current->next;
@@ -67,6 +77,7 @@ void ListSet::clear() {
 }
 
 void ListSet::copyFrom(const ListSet &other) {
+    std::cout << "ListSet::copyFrom called\n";
     ListNode **tail = &head;
     for (ListNode *current = other.head; current != nullptr; current = current->next) {
         *tail = new ListNode{current->data, nullptr};
@@ -76,6 +87,7 @@ void ListSet::copyFrom(const ListSet &other) {
 }
 
 bool ListSet::contains(char c) const {
+    std::cout << "ListSet::contains called\n";
     for (ListNode *current = head; current != nullptr; current = current->next) {
         if (current->data == c) {
             return true;
@@ -85,12 +97,14 @@ bool ListSet::contains(char c) const {
 }
 
 void ListSet::insert(char c) {
+    std::cout << "ListSet::insert called\n";
     ListNode *node = new ListNode{c, head};
     head = node;
     ++size;
 }
 
 ListSet ListSet::operator&(const ListSet &other) const {
+    std::cout << "ListSet::operator& called\n";
     ListSet result{};
     for (ListNode *current = head; current != nullptr; current = current->next) {
         if (other.contains(current->data)) {
@@ -101,6 +115,7 @@ ListSet ListSet::operator&(const ListSet &other) const {
 }
 
 ListSet ListSet::operator|(const ListSet &other) const {
+    std::cout << "ListSet::operator| called\n";
     ListSet result{};
     for (ListNode *current = head; current != nullptr; current = current->next) {
         if (!result.contains(current->data)) {

@@ -5,7 +5,6 @@
 class BitArraySet {
   public:
     BitArraySet() = default;
-    explicit BitArraySet(char);
     BitArraySet(const BitArraySet &other) = default;
     BitArraySet &operator=(const BitArraySet &other) = default;
     BitArraySet(BitArraySet &&other) noexcept = default;
